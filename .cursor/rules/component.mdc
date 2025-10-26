@@ -1,0 +1,63 @@
+---
+alwaysApply: true
+---
+
+# Cursor Rules — Component Generation (Design System + shadcn)
+
+## Networking Constraint (strict)
+- Do **NOT** search or browse the web for components, code, or docs.
+- Only use the **shadcn MCP registry** as the single source of truth.
+
+## Fetch & Existence Rules
+1) Always attempt to fetch the component from **shadcn MCP** first.
+2) If the MCP connection fails:
+   - **STOP** and reply verbatim:
+     "ERROR: Unable to fetch component from shadcn MCP (connection failed). No files were created."
+3) If the component **does not exist** in the shadcn registry:
+   - **DO NOT generate anything** and **do not create files**.
+   - Reply with a **suggestion-only** message, e.g.:
+     "SUGGESTION: The requested component '<ComponentName>' does not exist in the shadcn registry. You can use the component <xyz>, or the component you want could be the combination of <x> and <y> from shadcn."
+   - Provide at least one direct alternative and, when reasonable, one compositional suggestion.
+
+## File Layout (only after successful fetch)
+- Component root: `src/components/ui/<ComponentName>/`
+  - `src/components/ui/<ComponentName>/<ComponentName>.tsx`
+  - `src/components/ui/<ComponentName>/<ComponentName>.test.tsx` (Vitest; target ~100% coverage incl. branches)
+  - `src/components/ui/<ComponentName>/index.ts`
+- Storybook: `src/stories/<ComponentName>.stories.tsx` (CSF3)
+
+## Storybook Rules
+- CSF3 with `Meta` & `StoryObj` (`title`, `component`).
+- **Autodocs**: `tags: ['autodocs']` (use generated docs).
+- **Actions**: wire event props via `argTypes` (e.g., `onClick: { action: 'clicked' }`) or
+  `parameters: { actions: { handles: ['click','keydown','change'] } }`.
+- Provide a **Primary** story and at least one **Controls** story; optional `play()` for simple interactions.
+- Show light/dark theme states if styling applies.
+
+## Implementation Rules (after successful fetch)
+- Start from the shadcn version; preserve a11y behavior and API (`props`, `asChild`, `forwardRef`, `displayName`).
+- Styling: Tailwind v4 + tokens (CSS variables) — avoid hardcoded themed values.
+- Variants with `cva` (or project helper); document `variant`/`size`.
+- TypeScript strict; avoid `any`; use native DOM prop types when wrapping primitives.
+- Export from component `index.ts` and any package barrel if present.
+
+## Testing Rules (Vitest + Testing Library)
+- Cover render, variants/sizes, disabled/loading, events, keyboard behavior, ref forwarding.
+- Verify ARIA roles/attributes and visible focus; use `@testing-library/user-event`.
+- Aim for near-**100%** coverage (lines/branches/functions); add coverage notes/assertions or CI thresholds.
+
+## Authoring Checklist
+- [ ] Retrieved from **shadcn MCP** (source noted in header comment).
+- [ ] If MCP connection failed → returned **ERROR** message; created **no files**.
+- [ ] If component missing → returned **SUGGESTION** message; created **no files**.
+- [ ] `forwardRef`, `asChild` (when relevant), accepts `className`, spreads `...props`.
+- [ ] Story in `src/stories/` using **Autodocs** + **Actions** (Primary + Controls).
+- [ ] Vitest tests in component folder with near-100% coverage.
+- [ ] **No web searches performed.**
+
+## Prompt Snippet
+"Generate **<ComponentName>** from the **shadcn MCP registry only** (no web search). If MCP connection fails, stop and reply with the exact ERROR message. If the component doesn’t exist, stop and reply with a SUGGESTION including at least one alternative (e.g., 'you can use the component xyz') or a composition hint (e.g., 'the component you want could be the combination of component x or y from shadcn'). When successful, create:
+- `src/components/ui/<ComponentName>/<ComponentName>.tsx`
+- `src/components/ui/<ComponentName>/<ComponentName>.test.tsx` (Vitest; near-100% coverage, a11y + interactions)
+- `src/components/ui/<ComponentName>/index.ts`
+- `src/stories/<ComponentName>.stories.tsx` (CSF3, `tags: ['autodocs']`, Actions via `argTypes` or `parameters.actions`, Primary + Controls)

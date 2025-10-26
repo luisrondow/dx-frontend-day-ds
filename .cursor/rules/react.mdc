@@ -1,0 +1,26 @@
+---
+globs: *.tsx
+alwaysApply: false
+---
+# Cursor Rules — React Editing (Design System + shadcn)
+
+## Scope
+- Applies to edits/refactors/fixes in `src/components/ui/**`.
+- Maintain API stability; if a breaking change is requested → STOP and suggest a deprecation path.
+
+## React Authoring (concise)
+- Use **TypeScript strict**; no `any`.
+- Prefer **forwardRef** + `displayName` for focusable primitives.
+- Support **`asChild`** when shadcn does (Radix `Slot`).
+- Accept `className`; spread `...props`; keep native DOM prop types (e.g., `ComponentPropsWithoutRef<'button'>`).
+- Styling: **Tailwind v4** with **CSS variable tokens**; avoid hardcoded themed values.
+- Variants: **cva** (or project helper); keep `variant` & `size` defaults aligned with shadcn.
+- Preserve shadcn **a11y** (roles, ARIA, keyboard, focus ring).
+
+## File Boundaries
+- Keep components under `src/components/ui/<Name>/`; maintain barrel `index.ts`.
+- Re-export from package barrels only additively; avoid runtime dep changes.
+
+## Commit Discipline
+- Edits must include corresponding story + test updates in the same change.
+- No breaking removals/behavior changes without a deprecation suggestion.
