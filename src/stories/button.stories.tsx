@@ -19,7 +19,14 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      options: [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+      ],
       description: "The visual style variant of the button",
     },
     size: {
@@ -29,7 +36,8 @@ const meta = {
     },
     asChild: {
       control: "boolean",
-      description: "Compose the button with other components using Radix UI Slot",
+      description:
+        "Compose the button with other components using Radix UI Slot",
     },
     disabled: {
       control: "boolean",
